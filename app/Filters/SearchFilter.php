@@ -10,7 +10,10 @@ class SearchFilter extends BaseFilter
 {
     protected string $operator = 'regex';
 
-    protected ?string $pattern = null;
+    /**
+     * @var null|callable(mixed:value): string
+     */
+    protected $customPattern = null;
 
     protected string $flags = 'i';
 
@@ -32,11 +35,25 @@ class SearchFilter extends BaseFilter
     }
 
     /**
-     * @param  $callBackPattern  callable(mixed $value): string
+     * @param  $callBackPattern callable(mixed $value): string
      */
-    public function setPattern(callable $callBackPattern): static
+    public function setCustomPattern(callable $callBackPattern): static
     {
-        $this->pattern = ($callBackPattern)($this->value);
+        $this->customPattern = $callBackPattern;
+
+        return $this;
+    }
+
+    public function startsWith(): static
+    {
+        $this->customPattern = fn(mixed $value) => '^' . $value;
+
+        return $this;
+    }
+
+    public function endsWith(): static
+    {
+        $this->customPattern = fn(mixed $value) => $value . "$";
 
         return $this;
     }
@@ -59,6 +76,8 @@ class SearchFilter extends BaseFilter
 
     protected function getRegexByString(string $value): Regex
     {
-        return new Regex($this->pattern ?? $value, $this->flags);
+        $pattern = $this->customPattern ? ($this->customPattern)($value) : $value;
+
+        return new Regex($pattern, $this->flags);
     }
 }

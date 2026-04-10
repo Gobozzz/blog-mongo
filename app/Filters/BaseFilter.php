@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BaseFilter implements FilterContract
 {
-    protected function __construct() {}
+    protected function __construct()
+    {
+    }
 
     protected string $column;
 

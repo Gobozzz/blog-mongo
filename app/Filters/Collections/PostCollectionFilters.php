@@ -19,7 +19,7 @@ class PostCollectionFilters implements CollectionFiltersContract
                         $subBuilder->where('title', 'regex', $value)
                             ->orWhere('content', 'regex', $value);
                     });
-                }),
+                })->endsWith(),
             ContainFilter::make('slug', 'f_tag')
                 ->setRelation('tags'),
         ];
