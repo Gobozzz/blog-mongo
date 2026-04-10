@@ -23,22 +23,7 @@ class ContainFilter extends BaseFilter
 
     protected function shouldSkipFilter(): bool
     {
-        return ! is_array($this->value) || empty($this->value);
-    }
-
-    protected function buildQuery(Builder $builder): Builder
-    {
-        if ($this->customBuilderQuery !== null) {
-            return ($this->customBuilderQuery)($builder, $this->value);
-        }
-
-        if ($this->relation !== null) {
-            return $builder->whereHas($this->relation, function (Builder $subQuery) {
-                $this->applyFilterByOperator($subQuery);
-            });
-        }
-
-        return $this->applyFilterByOperator($builder);
+        return !is_array($this->value) || empty($this->value);
     }
 
     protected function applyFilterByOperator(Builder $builder): Builder

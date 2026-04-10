@@ -16,7 +16,7 @@ class PostEloquentRepository implements PostRepositoryContract
             ->with(['user', 'tags'])
             ->filters(PostCollectionFilters::class)
             ->latest()
-            ->paginate(8);
+            ->paginate($perPage);
 
         return $query;
     }
