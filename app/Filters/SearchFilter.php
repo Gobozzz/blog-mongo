@@ -17,15 +17,6 @@ class SearchFilter extends BaseFilter
 
     protected string $flags = 'i';
 
-    protected function setValue(): void
-    {
-        $value = $this->getValue();
-
-        if (is_string($value)) {
-            $this->value = $this->getRegexByString($value);
-        }
-    }
-
     /**
      * @param  $callBackPattern  callable(mixed $value): string
      */
@@ -66,9 +57,23 @@ class SearchFilter extends BaseFilter
         return $this;
     }
 
-    protected function getRegexByString(string $value): Regex
+    protected function setValue(): void
     {
-        $pattern = $this->customPattern ? ($this->customPattern)($value) : $value;
+        $value = $this->getValue();
+
+        if (is_string($value)) {
+            $this->value = $this->getRegexByString($value);
+        }
+    }
+
+    protected function shouldSkipFilter(): bool
+    {
+        return ! ($this->value instanceof Regex) || empty(trim($this->value->getPattern()));
+    }
+
+    protected function getRegexByString(string $string): Regex
+    {
+        $pattern = $this->customPattern ? ($this->customPattern)($string) : $string;
 
         return new Regex($pattern, $this->flags);
     }
