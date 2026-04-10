@@ -23,7 +23,7 @@ class ContainFilter extends BaseFilter
 
     protected function shouldSkipFilter(): bool
     {
-        return !is_array($this->value) || empty($this->value);
+        return ! is_array($this->value) || empty($this->value);
     }
 
     protected function applyFilterByOperator(Builder $builder): Builder

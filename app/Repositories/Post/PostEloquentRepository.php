@@ -10,14 +10,12 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PostEloquentRepository implements PostRepositoryContract
 {
-    public function paginate(int $perPage = 8): LengthAwarePaginator
+    public function paginate(int $perPage = 8, array $filtersData = []): LengthAwarePaginator
     {
-        $query = Post::query()
+        return Post::query()
             ->with(['user', 'tags'])
-            ->filters(PostCollectionFilters::class)
+            ->filters(PostCollectionFilters::make($filtersData))
             ->latest()
             ->paginate($perPage);
-
-        return $query;
     }
 }

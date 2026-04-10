@@ -8,5 +8,5 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 interface PostRepositoryContract
 {
-    public function paginate(int $perPage = 8): LengthAwarePaginator;
+    public function paginate(int $perPage = 8, array $filtersData = []): LengthAwarePaginator;
 }

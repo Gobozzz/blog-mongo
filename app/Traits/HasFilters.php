@@ -12,10 +12,10 @@ use Illuminate\Database\Eloquent\Builder;
 trait HasFilters
 {
     /**
-     * @param  FilterContract[]|string  $filters
+     * @param  FilterContract[]|CollectionFiltersContract  $filters
      */
     #[Scope]
-    public function filters(Builder $query, array|string $filters): Builder
+    public function filters(Builder $query, array|CollectionFiltersContract $filters): Builder
     {
         $filters = $this->parseFilters($filters);
 
@@ -28,14 +28,10 @@ trait HasFilters
         return $query;
     }
 
-    private function parseFilters(array|string $filters): array
+    private function parseFilters(array|CollectionFiltersContract $filters): array
     {
         if (is_array($filters)) {
             return $filters;
-        }
-
-        if (is_string($filters)) {
-            $filters = app($filters);
         }
 
         if ($filters instanceof CollectionFiltersContract) {
@@ -43,7 +39,7 @@ trait HasFilters
         }
 
         throw new \InvalidArgumentException(
-            'Filters must be an array, a class string implementing CollectionFiltersContract'
+            'Filters must be an array or CollectionFiltersContract'
         );
     }
 }

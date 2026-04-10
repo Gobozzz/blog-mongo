@@ -8,9 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 class BaseFilter implements FilterContract
 {
-    protected function __construct()
-    {
-    }
+    protected function __construct() {}
 
     protected string $column;
 
@@ -20,6 +18,8 @@ class BaseFilter implements FilterContract
 
     protected mixed $value = null;
 
+    protected array $values = [];
+
     protected ?string $relation = null;
 
     /**
@@ -27,20 +27,19 @@ class BaseFilter implements FilterContract
      */
     protected $customBuilderQuery = null;
 
-    public static function make(string $column, string $requestKey): static
+    public static function make(string $column, string $requestKey, array $values = []): static
     {
         $instance = new static;
         $instance->column = $column;
         $instance->requestKey = $requestKey;
+        $instance->values = $values;
 
         return $instance;
     }
 
     public function apply(Builder $builder): Builder
     {
-        if ($this->value === null) {
-            $this->setValue();
-        }
+        $this->setValue();
 
         if ($this->shouldSkipFilter()) {
             return $builder;
@@ -52,6 +51,13 @@ class BaseFilter implements FilterContract
     public function setOperator(string $operator): static
     {
         $this->operator = $operator;
+
+        return $this;
+    }
+
+    public function setValues(array $values): static
+    {
+        $this->values = $values;
 
         return $this;
     }
@@ -73,24 +79,25 @@ class BaseFilter implements FilterContract
         return $this;
     }
 
-    public function setValue(mixed $customValue = null): static
+    protected function setValue(): void
     {
-        if ($customValue !== null) {
-            $this->value = $customValue;
-
-            return $this;
-        }
-
-        $value = $this->getRequestValue();
+        $value = $this->getValue();
 
         $this->value = $value;
-
-        return $this;
     }
 
-    protected function getRequestValue(): mixed
+    protected function getValue(): mixed
     {
-        return request()->input($this->requestKey);
+        return $this->prepareValue($this->values[$this->requestKey] ?? null);
+    }
+
+    protected function prepareValue(mixed $value): mixed
+    {
+        if (is_string($value)) {
+            $value = trim($value);
+        }
+
+        return $value;
     }
 
     protected function buildQuery(Builder $builder): Builder
@@ -98,6 +105,7 @@ class BaseFilter implements FilterContract
         if ($this->customBuilderQuery !== null) {
             return ($this->customBuilderQuery)($builder, $this->value);
         }
+
         if ($this->relation !== null) {
             return $builder->whereHas($this->relation, function (Builder $subQuery) {
                 $this->applyFilterByOperator($subQuery);
