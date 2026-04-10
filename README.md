@@ -10,10 +10,12 @@
 
 ## Комментирование
 
-В рамках сущности комментарий проработаю возможность "Вложенных документов" в MongoDB. Буду хранить последние 3 комментария в документе самого поста. 
-Это даст возможность выводить превью комментариев, например в карточке поста. 
+В рамках сущности "Комментарий" проработаю возможность "Вложенных документов" в MongoDB. Буду хранить последние 3
+комментария в документе самого поста.
+Это даст возможность выводить превью комментариев, например в карточке поста.
 
-В таком случае важно будет проследить за актуальностью данных, так как комментарий мог удалиться или могло измениться его содержимое.
+В таком случае важно будет проследить за актуальностью данных, так как комментарий мог удалиться или могло измениться
+его содержимое.
 
 В остальных сущностях использую привычную Reference связь.
 
@@ -21,7 +23,7 @@
 
 ![img.png](readme-images/filters-1.png)
 
-Рабочая папка фильтров находится в App/Filters.
+Рабочая папка фильтров - `App/Filters`.
 
 Работа фильтров централизована. Все фильтры реализуют один интерфейс. И наследуются от BaseFilter.
 
@@ -30,6 +32,9 @@
 Благодаря этому можно создавать различные фильтры, под разные нужды.
 
 Фильтры можно объеденять в коллекции, или передавать в виде массива в скоуп `filters()` модели Eloquent.
+
+Фильтры не привязаны к HTTP. Значения фильтров они получают в виде массива, поэтому значения спускаются выше уровнем до
+фильтров.
 
 ### Пример использования
 
@@ -45,21 +50,35 @@ class Post extends Model
 Используем фильтры
 
 ```php
-Post::query()
-    ->filters(PostCollectionFilters::class)
-    ->latest()
-    ->paginate(8);
+class PostEloquentRepository implements PostRepositoryContract
+{
+    public function paginate(int $perPage = 8, array $filtersData = []): LengthAwarePaginator
+    {
+        return Post::query()
+            ->with(['user', 'tags'])
+            ->filters(PostCollectionFilters::make($filtersData))
+            ->latest()
+            ->paginate($perPage);
+    }
+}
 
 // или
 
-Post::query()
-    ->filters([
-        BaseFilter::make('count_views', 'f_min_views')->setOperator('>='),
-        ContainFilter::make('slug', 'f_tag')->setRelation('tags'),
-        // остальные фильтры
-    ])
-    ->latest()
-    ->paginate(8);
+class PostEloquentRepository implements PostRepositoryContract
+{
+    public function paginate(int $perPage = 8, array $filtersData = []): LengthAwarePaginator
+    {
+        return Post::query()
+            ->with(['user', 'tags'])
+            ->filters([
+                BaseFilter::make('count_views', 'f_min_views', $filtersData)->setOperator('>='),
+                ContainFilter::make('slug', 'f_tag', $filtersData)->setRelation('tags'),
+                // остальные фильтры
+            ])
+            ->latest()
+            ->paginate($perPage);
+    }
+}
 
 ```
 
@@ -68,7 +87,7 @@ Post::query()
 Он необходим для поиска в текстовых полях. В Монго есть возможность искать через регулярные выражения с помощью `Regex`,
 а также
 есть [текстовый индекс и более мощный поиск поддерживающий релевантную выборку](https://www.mongodb.com/docs/drivers/php/laravel-mongodb/current/fundamentals/read-operations/#std-label-laravel-fundamentals-read-ops),
-однако в проекте используется `Regex` поиск, с ростом нагрузки лучше перебраться на текстовые индексы
+однако в проекте использую `Regex` поиск для упрощения, с ростом нагрузки лучше перебраться на текстовые индексы
 
 ## Деплой
 
