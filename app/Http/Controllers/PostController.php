@@ -13,10 +13,8 @@ class PostController extends Controller
 {
     public function __construct(
         private readonly PostRepositoryContract $postRepository,
-        private readonly TagRepositoryContract  $tagRepository,
-    )
-    {
-    }
+        private readonly TagRepositoryContract $tagRepository,
+    ) {}
 
     public function index(Request $request): View
     {
