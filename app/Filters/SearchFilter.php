@@ -17,25 +17,17 @@ class SearchFilter extends BaseFilter
 
     protected string $flags = 'i';
 
-    public function setValue(mixed $customValue = null): static
+    protected function setValue(): void
     {
-        if (is_string($customValue)) {
-            $this->value = $this->getRegexByString($customValue);
-
-            return $this;
-        }
-
-        $value = $this->getRequestValue();
+        $value = $this->getValue();
 
         if (is_string($value)) {
             $this->value = $this->getRegexByString($value);
         }
-
-        return $this;
     }
 
     /**
-     * @param  $callBackPattern callable(mixed $value): string
+     * @param  $callBackPattern  callable(mixed $value): string
      */
     public function setCustomPattern(callable $callBackPattern): static
     {
@@ -46,14 +38,14 @@ class SearchFilter extends BaseFilter
 
     public function startsWith(): static
     {
-        $this->customPattern = fn(mixed $value) => '^' . $value;
+        $this->customPattern = fn (mixed $value) => '^'.$value;
 
         return $this;
     }
 
     public function endsWith(): static
     {
-        $this->customPattern = fn(mixed $value) => $value . "$";
+        $this->customPattern = fn (mixed $value) => $value.'$';
 
         return $this;
     }

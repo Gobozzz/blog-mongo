@@ -8,19 +8,19 @@ use App\Filters\ContainFilter;
 use App\Filters\SearchFilter;
 use Illuminate\Database\Eloquent\Builder;
 
-class PostCollectionFilters implements CollectionFiltersContract
+class PostCollectionFilters extends BaseCollectionFilters
 {
     public function toArray(): array
     {
         return [
-            SearchFilter::make('title', 'f_search')
+            SearchFilter::make(column: 'title', requestKey: 'f_search', values: $this->values)
                 ->setCustomBuilderQuery(function (Builder $builder, mixed $value) {
                     return $builder->where(function (Builder $subBuilder) use ($value) {
                         $subBuilder->where('title', 'regex', $value)
                             ->orWhere('content', 'regex', $value);
                     });
-                })->endsWith(),
-            ContainFilter::make('slug', 'f_tag')
+                }),
+            ContainFilter::make(column: 'slug', requestKey: 'f_tag', values: $this->values)
                 ->setRelation('tags'),
         ];
     }
