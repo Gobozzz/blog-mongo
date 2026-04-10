@@ -1,0 +1,58 @@
+services:
+
+  ####################################################################################################
+  # PHP
+  ####################################################################################################
+  php:
+    build: .docker/php
+    ports:
+      - 5173:5173
+    volumes:
+      - .:/var/www:cached
+    depends_on:
+      - mongodb
+  #    environment:
+  #      - PHP_IDE_CONFIG=serverName=localhost для xDebug
+
+  ####################################################################################################
+  # Nginx
+  ####################################################################################################
+  nginx:
+    image: nginx
+    ports:
+      - 80:80
+    volumes:
+      - .:/var/www
+      - .docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - php
+
+  ####################################################################################################
+  # MongoDB
+  ####################################################################################################
+  mongodb:
+    image: mongo:7.0  # Актуальная версия
+    container_name: laravel_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"  # Стандартный порт MongoDB
+    volumes:
+      - .docker/mongodb/data:/data/db  # Данные MongoDB
+      - .docker/mongodb/logs:/var/log/mongodb  # Логи
+      - .docker/mongodb/init:/docker-entrypoint-initdb.d  # Скрипты инициализации (опционально)
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+      MONGO_INITDB_DATABASE: laravel_project  # Имя вашей БД
+
+  ####################################################################################################
+  # Redis
+  ####################################################################################################
+  redis:
+    image: redis:latest
+    command: redis-server --appendonly yes
+    volumes:
+      - .docker/redis/data:/data
+    ports:
+      - 6379:6379
