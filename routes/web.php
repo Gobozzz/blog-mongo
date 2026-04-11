@@ -11,6 +11,10 @@ Route::middleware('auth')->group(function () {
 
     Route::prefix('posts')->name('posts.')->group(function () {
         Route::get('/', [PostController::class, 'index'])->name('index');
+        Route::get('/my-posts', [PostController::class, 'myPosts'])->name('my');
+        Route::get('/create', [PostController::class, 'create'])->name('create');
+        Route::post('/', [PostController::class, 'store'])->name('store');
+        Route::get('/{post}', [PostController::class, 'show'])->name('show');
     });
 
     Route::middleware('auth')->prefix('profile')->name('profile.')->group(function () {
