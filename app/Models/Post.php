@@ -9,6 +9,7 @@ use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Relations\BelongsTo;
 use MongoDB\Laravel\Relations\BelongsToMany;
 use MongoDB\Laravel\Relations\HasMany;
+use Sebdesign\SM\Facade as StateMachine;
 
 class Post extends Model
 {
@@ -19,7 +20,20 @@ class Post extends Model
         'title',
         'content',
         'user_id',
+        'status',
     ];
+
+    public function getCurrentStateLabel(): string
+    {
+        $stateMachine = StateMachine::get($this, 'posts_state_machine');
+
+        return match ($stateMachine->getState()) {
+            'draft' => 'Черновик',
+            'moderation' => 'На модерации',
+            'published' => 'Опубликована',
+            default => 'Неизвестно'
+        };
+    }
 
     public function user(): BelongsTo
     {

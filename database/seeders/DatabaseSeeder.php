@@ -24,7 +24,13 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('qwerty'),
         ]);
 
-        User::factory(2)->create();
+        User::factory(1)->create();
+
+        User::factory(1)->moderator()->create([
+            'name' => 'Moderator',
+            'email' => 'moderator@gmail.com',
+            'password' => Hash::make('qwerty'),
+        ]);
 
         Tag::factory(10)->create();
 

@@ -25,6 +25,7 @@ class PostFactory extends Factory
             'content' => fake()->realTextBetween(500, 1000),
             'user_id' => User::randomId() ?? User::factory(),
             'created_at' => fake()->dateTime(),
+            'status' => 'draft',
         ];
     }
 
