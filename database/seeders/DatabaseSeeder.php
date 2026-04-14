@@ -24,11 +24,21 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('qwerty'),
         ]);
 
-        User::factory(2)->create();
+        User::factory(1)->create();
+
+        User::factory(1)->moderator()->create([
+            'name' => 'Moderator',
+            'email' => 'moderator@gmail.com',
+            'password' => Hash::make('qwerty'),
+        ]);
 
         Tag::factory(10)->create();
 
         Post::factory(5)->create();
+
+        Post::factory(5)->moderation()->create();
+
+        Post::factory(5)->published()->create();
 
         Post::factory(25)->withComments(10)->withTags(3)->create();
 

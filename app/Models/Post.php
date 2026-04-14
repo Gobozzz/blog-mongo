@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PostStatus;
 use App\Traits\HasFilters;
 use App\Traits\HasRandomFetchModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,6 +10,7 @@ use MongoDB\Laravel\Eloquent\Model;
 use MongoDB\Laravel\Relations\BelongsTo;
 use MongoDB\Laravel\Relations\BelongsToMany;
 use MongoDB\Laravel\Relations\HasMany;
+use Sebdesign\SM\Facade as StateMachine;
 
 class Post extends Model
 {
@@ -19,7 +21,20 @@ class Post extends Model
         'title',
         'content',
         'user_id',
+        'status',
     ];
+
+    public function getStatusLabel(): string
+    {
+        $stateMachine = StateMachine::get($this, 'posts_state_machine');
+
+        return match ($stateMachine->getState()) {
+            PostStatus::DRAFT->value => 'Черновик',
+            PostStatus::MODERATION->value => 'На модерации',
+            PostStatus::PUBLISHED->value => 'Опубликована',
+            default => 'Неизвестно'
+        };
+    }
 
     public function user(): BelongsTo
     {
