@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PostStatus;
 use App\Traits\HasFilters;
 use App\Traits\HasRandomFetchModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,14 +24,14 @@ class Post extends Model
         'status',
     ];
 
-    public function getCurrentStateLabel(): string
+    public function getStatusLabel(): string
     {
         $stateMachine = StateMachine::get($this, 'posts_state_machine');
 
         return match ($stateMachine->getState()) {
-            'draft' => 'Черновик',
-            'moderation' => 'На модерации',
-            'published' => 'Опубликована',
+            PostStatus::DRAFT->value => 'Черновик',
+            PostStatus::MODERATION->value => 'На модерации',
+            PostStatus::PUBLISHED->value => 'Опубликована',
             default => 'Неизвестно'
         };
     }

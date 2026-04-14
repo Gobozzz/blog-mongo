@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\PostStatus;
 use App\Models\Post;
 
 return [
@@ -8,26 +9,26 @@ return [
         'graph' => 'posts_state_machine',
         'property_path' => 'status',
         'states' => [
-            'draft',
-            'moderation',
-            'published',
+            PostStatus::DRAFT->value,
+            PostStatus::MODERATION->value,
+            PostStatus::PUBLISHED->value,
         ],
         'transitions' => [
             'to_moderation' => [
-                'from' => ['draft'],
-                'to' => 'moderation',
+                'from' => [PostStatus::DRAFT->value],
+                'to' => PostStatus::MODERATION->value,
             ],
             'to_published' => [
-                'from' => ['moderation'],
-                'to' => 'published',
+                'from' => [PostStatus::MODERATION->value],
+                'to' => PostStatus::PUBLISHED->value,
             ],
             'to_draft' => [
-                'from' => ['published'],
-                'to' => 'draft',
+                'from' => [PostStatus::PUBLISHED->value],
+                'to' => PostStatus::DRAFT->value,
             ],
             'to_moderation_from_published' => [
-                'from' => ['published'],
-                'to' => 'moderation',
+                'from' => [PostStatus::PUBLISHED->value],
+                'to' => PostStatus::MODERATION->value,
             ],
         ],
         'callbacks' => [

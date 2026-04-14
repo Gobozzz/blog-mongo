@@ -36,6 +36,10 @@ class DatabaseSeeder extends Seeder
 
         Post::factory(5)->create();
 
+        Post::factory(5)->moderation()->create();
+
+        Post::factory(5)->published()->create();
+
         Post::factory(25)->withComments(10)->withTags(3)->create();
 
     }

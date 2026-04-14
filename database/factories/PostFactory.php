@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PostStatus;
 use App\Models\Comment;
 use App\Models\Post;
 use App\Models\Tag;
@@ -25,8 +26,22 @@ class PostFactory extends Factory
             'content' => fake()->realTextBetween(500, 1000),
             'user_id' => User::randomId() ?? User::factory(),
             'created_at' => fake()->dateTime(),
-            'status' => 'draft',
+            'status' => PostStatus::DRAFT->value,
         ];
+    }
+
+    public function published(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => PostStatus::PUBLISHED->value,
+        ]);
+    }
+
+    public function moderation(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => PostStatus::MODERATION->value,
+        ]);
     }
 
     public function withTags(?int $count = 1): static

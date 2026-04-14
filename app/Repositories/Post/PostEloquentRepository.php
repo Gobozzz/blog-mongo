@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repositories\Post;
 
 use App\DTO\Post\PostCreateDTO;
+use App\Enums\PostStatus;
 use App\Filters\Collections\PostCollectionFilters;
 use App\Models\Post;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -26,6 +27,7 @@ class PostEloquentRepository implements PostRepositoryContract
             'title' => $data->title,
             'content' => $data->content,
             'user_id' => $data->userId,
+            'status' => PostStatus::DRAFT->value,
         ]);
 
         if (! empty($data->tagsIds)) {
